@@ -1,16 +1,19 @@
 import BaseController from './base';
 import UsersController from './users';
 import RemindersController from './reminders';
+import SpeechController from '../lib/speech-controller';
 
 const p = Object.freeze({
   controllers: Symbol('controllers'),
   onHashChanged: Symbol('onHashChanged'),
+  speechController: Symbol('speechController'),
 });
 
 export default class MainController extends BaseController {
   constructor() {
     super();
 
+    const speechController = new SpeechController();
     const mountNode = document.querySelector('.app-view-container');
     const options = { mountNode };
 
@@ -23,6 +26,19 @@ export default class MainController extends BaseController {
       'reminders': remindersController,
     };
 
+    speechController.on(
+      'wakelistenstart', () => console.log('wakelistenstart'));
+
+    speechController.on('wakelistenstop', () => console.log('wakelistenstop'));
+    speechController.on('wakeheard', () => console.log('wakeheard'));
+    speechController.on(
+      'speechrecognitionstart', () => console.log('speechrecognitionstart'));
+
+    speechController.on(
+      'speechrecognitionstop', () => console.log('speechrecognitionstop'));
+
+    this[p.speechController] = speechController;
+
     window.addEventListener('hashchange', this[p.onHashChanged].bind(this));
   }
 
@@ -33,6 +49,10 @@ export default class MainController extends BaseController {
           console.error(e);
         });
     }
+
+    this[p.speechController].start().then(() => {
+      console.log('Speech controller started');
+    });
 
     location.hash = '';
     setTimeout(() => {

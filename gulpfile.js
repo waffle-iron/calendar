@@ -68,6 +68,7 @@ gulp.task('copy-app-common', () => {
   return merge(
     gulp.src([
       `${APP_ROOT}**`,
+      `${APP_ROOT}/data`,
       // Don't copy documentation files.
       `!${APP_ROOT}**/*.md`,
       // Don't copy JS, it will be compiled and copied on the compile step.
@@ -85,10 +86,14 @@ gulp.task('copy-app-common', () => {
       .pipe(rename('js/components/lodash.js')),
     gulp.src('./node_modules/moment/min/moment-with-locales.min.js')
       .pipe(rename('js/components/moment.js')),
+    gulp.src('./node_modules/jsspeechrecognizer/dist/JsSpeechRecognizer.js')
+      .pipe(rename('js/components/jsspeechrecognizer.js')),
 
     // Polyfills.
     gulp.src('./node_modules/whatwg-fetch/fetch.js')
-      .pipe(rename('js/polyfills/fetch.js'))
+      .pipe(rename('js/polyfills/fetch.js')),
+    gulp.src('./node_modules/webrtc-adapter/out/adapter.js')
+      .pipe(rename('js/polyfills/webrtc-adapter.js'))
   )
     .pipe(gulp.dest(DIST_APP_ROOT));
 });
