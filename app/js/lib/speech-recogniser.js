@@ -20,7 +20,7 @@ export default class SpeechRecogniser {
     if (supportsRecognition) {
       this[p.recognition] = new Recognition();
     } else {
-      this[p.recognition] = null
+      this[p.recognition] = null;
     }
 
     Object.seal(this);
@@ -55,7 +55,7 @@ export default class SpeechRecogniser {
         });
       };
 
-      this[p.recognition].onerror = (event) => {
+      this[p.recognition].onerror = (error) => {
         this[p.recognition].stop();
         this[p.isListening] = false;
         return reject(error);
