@@ -13,13 +13,17 @@ export default class SpeechRecogniser {
     const Recognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    this[p.supportsRecognition] = !!Recognition;
+    const supportsRecognition = !!Recognition;
 
-    if (Recognition) {
+    this[p.supportsRecognition] = supportsRecognition;
+
+    if (supportsRecognition) {
       this[p.recognition] = new Recognition();
     } else {
-      this[p.recognition] = {};
+      this[p.recognition] = null
     }
+
+    Object.seal(this);
   }
 
   listenForUtterance() {
@@ -35,6 +39,9 @@ export default class SpeechRecogniser {
 
       this[p.isListening] = true;
 
+      // Not using `addEventListener` here to avoid
+      // `removeEventListener` everytime it's simpler
+      // to just redefine `onresult` to the same effect.
       this[p.recognition].onresult = (event) => {
         this[p.recognition].stop();
         this[p.isListening] = false;
@@ -46,6 +53,12 @@ export default class SpeechRecogniser {
           confidence: result.confidence,
           utterance: result.transcript,
         });
+      };
+
+      this[p.recognition].onerror = (event) => {
+        this[p.recognition].stop();
+        this[p.isListening] = false;
+        return reject(error);
       };
 
       this[p.recognition].start();
