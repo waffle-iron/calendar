@@ -15,11 +15,9 @@ const p = Object.freeze({
   initialiseSpeechRecognition: Symbol('initialiseSpeechRecognition'),
   startListeningForWakeword: Symbol('startListeningForWakeword'),
   stopListeningForWakeword: Symbol('stopListeningForWakeword'),
-  handleKeywordSpotted: Symbol('handleKeywordSpotted'),
-  startSpeechRecognition: Symbol('startSpeechRecognition'),
+  listenForUtterance: Symbol('listenForUtterance'),
   handleSpeechRecognitionEnd: Symbol('handleSpeechRecognitionEnd'),
   intentParser: Symbol('intentParser'),
-  actOnIntent: Symbol('actOnIntent'),
 });
 
 const EVENT_INTERFACE = [
@@ -38,6 +36,9 @@ const EVENT_INTERFACE = [
 
   // Emit when the speech recognition engine returns a recognised phrase
   'speechrecognitionstop',
+
+  // Emit when an intent is successfully parsed and we have a reminder object.
+  'reminder',
 ];
 
 export default class SpeechController extends EventDispatcher {
@@ -48,8 +49,11 @@ export default class SpeechController extends EventDispatcher {
     const speechRecogniser = new SpeechRecogniser();
     this[p.intentParser] = new IntentParser();
 
-    wakeWordRecogniser.setOnKeywordSpottedCallback(
-      this[p.handleKeywordSpotted].bind(this));
+    wakeWordRecogniser.setOnKeywordSpottedCallback(() => {
+      this.emit(EVENT_INTERFACE[2]);
+
+      this.startSpeechRecognition();
+    });
 
     this[p.wakewordRecogniser] = wakeWordRecogniser;
     this[p.wakewordModelUrl] = '/data/wakeword_model.json';
@@ -61,6 +65,19 @@ export default class SpeechController extends EventDispatcher {
 
   start() {
     return this[p.initialiseSpeechRecognition]()
+      .then(this[p.startListeningForWakeword].bind(this));
+  }
+
+  startSpeechRecognition() {
+    return this[p.stopListeningForWakeword]()
+      .then(this[p.listenForUtterance].bind(this))
+      .then(this[p.handleSpeechRecognitionEnd].bind(this))
+      .then(this[p.startListeningForWakeword].bind(this))
+      .catch(this[p.startListeningForWakeword].bind(this));
+  }
+
+  stopSpeechRecognition() {
+    return this[p.speechRecogniser].abort()
       .then(this[p.startListeningForWakeword].bind(this));
   }
 
@@ -82,17 +99,7 @@ export default class SpeechController extends EventDispatcher {
     return this[p.wakewordRecogniser].stopListening();
   }
 
-  [p.handleKeywordSpotted]() {
-    this.emit(EVENT_INTERFACE[2]);
-
-    return this[p.stopListeningForWakeword]()
-      .then(this[p.startSpeechRecognition].bind(this))
-      .then(this[p.handleSpeechRecognitionEnd].bind(this))
-      .then(this[p.startListeningForWakeword].bind(this))
-      .catch(this[p.startListeningForWakeword].bind(this));
-  }
-
-  [p.startSpeechRecognition]() {
+  [p.listenForUtterance]() {
     this.emit(EVENT_INTERFACE[3]);
     return this[p.speechRecogniser].listenForUtterance();
   }
@@ -101,12 +108,9 @@ export default class SpeechController extends EventDispatcher {
     this.emit(EVENT_INTERFACE[4], result);
 
     // Parse intent
-    return this[p.intentParser].parse(result.utterance)
-      .then(this[p.actOnIntent].bind(this));
-  }
-
-  [p.actOnIntent](reminder = {}) {
-    // Act - return 'result' (TBD) async
-    return Promise.resolve(reminder);
+    this[p.intentParser].parse(result.utterance)
+      .then((reminder) => {
+        this.emit(EVENT_INTERFACE[5], reminder);
+      });
   }
 }
