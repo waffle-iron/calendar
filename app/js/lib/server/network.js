@@ -66,8 +66,16 @@ export default class Network extends EventDispatcher {
    * @return {Promise}
    */
   fetchJSON(url, method = 'GET', body = undefined) {
-    return this[p.fetch](url, 'application/json', method, body)
-      .then((response) => response.json());
+    const accept = 'application/json';
+    return this[p.fetch](url, accept, method, body)
+      .then((response) => {
+        const contentType = response.headers.get('Content-Type') || '';
+        if (response.ok && !contentType.startsWith(accept)) {
+          return;
+        }
+
+        return response.json();
+      });
   }
 
   /**
@@ -91,7 +99,7 @@ export default class Network extends EventDispatcher {
    * @param {string} accept The content mime type (eg. image/jpeg).
    * @param {string=} method The HTTP method (defaults to "GET").
    * @param {Object=} body An object of key/value.
-   * @return {Promise}
+   * @return {Promise<Response>}
    * @private
    */
   [p.fetch](url, accept, method = 'GET', body = undefined) {
