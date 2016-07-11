@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# version Thu Jul 07 2016 17:31:41 GMT+0100 (BST)
+# version Mon Jul 11 2016 09:46:22 GMT+0100 (BST)
 CACHE:
 browserconfig.xml
 favicon.ico
@@ -10,10 +10,10 @@ data/wakeword_model.json
 img/icon-ios.svg
 img/icon-windows.svg
 img/icon.svg
-media/cue.wav
 js/alameda.js
 js/app.js
 js/bootstrap.js
+media/cue.wav
 css/FiraSans/FiraSans-Bold.woff
 css/FiraSans/FiraSans-BoldItalic.woff
 css/FiraSans/FiraSans-Hair.woff
