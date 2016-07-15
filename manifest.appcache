@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# version Fri Jul 15 2016 14:10:32 GMT+0100 (BST)
+# version Fri Jul 15 2016 15:35:24 GMT+0100 (BST)
 CACHE:
 browserconfig.xml
 favicon.ico
@@ -14,6 +14,16 @@ js/alameda.js
 js/app.js
 js/bootstrap.js
 media/cue.wav
+css/FiraSans/FiraSans-Bold.woff
+css/FiraSans/FiraSans-BoldItalic.woff
+css/FiraSans/FiraSans-Hair.woff
+css/FiraSans/FiraSans-HairItalic.woff
+css/FiraSans/FiraSans-Italic.woff
+css/FiraSans/FiraSans-Light.woff
+css/FiraSans/FiraSans-LightItalic.woff
+css/FiraSans/FiraSans-Regular.woff
+css/FiraSans/FiraSans-UltraLight.woff
+css/FiraSans/FiraSans-UltraLightItalic.woff
 css/icons/delete.svg
 css/icons/microphone.svg
 css/icons/next.svg
@@ -28,16 +38,6 @@ img/icons/512.png
 img/icons/60.png
 img/icons/64.png
 img/icons/90.png
-css/FiraSans/FiraSans-Bold.woff
-css/FiraSans/FiraSans-BoldItalic.woff
-css/FiraSans/FiraSans-Hair.woff
-css/FiraSans/FiraSans-HairItalic.woff
-css/FiraSans/FiraSans-Italic.woff
-css/FiraSans/FiraSans-Light.woff
-css/FiraSans/FiraSans-LightItalic.woff
-css/FiraSans/FiraSans-Regular.woff
-css/FiraSans/FiraSans-UltraLight.woff
-css/FiraSans/FiraSans-UltraLightItalic.woff
 img/static-icons/apple-touch-icon-114x114.png
 img/static-icons/apple-touch-icon-120x120.png
 img/static-icons/apple-touch-icon-144x144.png
