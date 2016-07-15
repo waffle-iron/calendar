@@ -1,6 +1,7 @@
 'use strict';
 
 import EventDispatcher from '../common/event-dispatcher';
+import { HttpError } from '../common/errors';
 
 const p = Object.freeze({
   // Private properties.
@@ -124,16 +125,10 @@ export default class Network extends EventDispatcher {
     return fetch(url, req)
       .then((res) => {
         if (!res.ok) {
-          throw new TypeError(
-            `The response returned a ${res.status} HTTP status code.`
-          );
+          throw new HttpError(res.status);
         }
 
         return res;
-      })
-      .catch((error) => {
-        console.error('Error occurred while fetching content: ', error);
-        throw error;
       });
   }
 }
