@@ -19,6 +19,9 @@ export default class SpeechRecogniser {
 
     if (supportsRecognition) {
       this[p.recognition] = new Recognition();
+      // Continuous mode prevents Android from being stuck for 5 seconds between
+      // the last word said and the results to come in.
+      this[p.recognition].continuous = true;
     } else {
       this[p.recognition] = null;
     }
@@ -32,27 +35,32 @@ export default class SpeechRecogniser {
         new Error('Speech recognition not supported in this browser'));
     }
 
-    return new Promise((resolve, reject) => {
-      if (this[p.isListening]) {
-        return reject(new Error('Speech recognition is already listening'));
-      }
+    if (this[p.isListening]) {
+      return Promise.reject(
+        new Error('Speech recognition is already listening'));
+    }
 
+    return new Promise((resolve, reject) => {
       this[p.isListening] = true;
 
       // Not using `addEventListener` here to avoid
       // `removeEventListener` everytime it's simpler
       // to just redefine `onresult` to the same effect.
       this[p.recognition].onresult = (event) => {
-        this[p.recognition].stop();
-        this[p.isListening] = false;
+        // Due to continuous mode, many results may arrive. We choose to only
+        // return the first result and to forget about the following ones.
+        if (this[p.isListening]) {
+          this[p.recognition].stop();
+          this[p.isListening] = false;
 
-        // Always take first result
-        const result = event.results[0][0];
+          // Always take first result
+          const result = event.results[0][0];
 
-        return resolve({
-          confidence: result.confidence,
-          utterance: result.transcript,
-        });
+          return resolve({
+            confidence: result.confidence,
+            utterance: result.transcript,
+          });
+        }
       };
 
       this[p.recognition].onerror = (error) => {
